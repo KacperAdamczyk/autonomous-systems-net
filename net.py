@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
 # Parametry uczenia
-hiddenLayer = 10
+hiddenLayers = [10]
 epochs = 1000
 errorGoal = 0.01
 
@@ -33,7 +33,7 @@ Xtrain, Xtest, ytrain, ytest = train_test_split(
 inputLayers = []
 for (columnName, columnData) in Xtrain.iteritems():
     inputLayers.append([min(columnData), max(columnData)])
-net = nl.net.newff(inputLayers, [hiddenLayer, 1])
+net = nl.net.newff(inputLayers, [*hiddenLayers, 1])
 
 # Uczenie sieci
 error = net.train(Xtrain, ytrain, epochs=epochs, goal=errorGoal, show=epochs)
@@ -42,8 +42,24 @@ error = net.train(Xtrain, ytrain, epochs=epochs, goal=errorGoal, show=epochs)
 outTrain = net.sim(Xtrain)
 outTest = net.sim(Xtest)
 
+# Sortowanie tablic wynikowych dla bardziej przejrzystej prezentacji
+train = []
+test = []
+for x, y in zip(outTrain, ytrain):
+    train.append([*x, *y])
+for x, y in zip(outTest, ytest):
+    test.append([*x, *y])
+train.sort(key=lambda pair: pair[1])
+test.sort(key=lambda pair: pair[1])
+
 # Prezentacja wyników
+epochsElapsed = len(error)
+print(f'Epochs: {len(error)}')
+pl.figure(
+    f'Max epochs = {epochs} Hidden layers = {len(hiddenLayers)} Neurons = {hiddenLayers}')
 pl.subplot(311)
+pl.title(
+    f'Epoki: {epochsElapsed} Ukryte warstwy = {len(hiddenLayers)} Neurony = {hiddenLayers}')
 pl.plot(error)
 pl.xlabel('Epoka')
 pl.ylabel('Błąd SSE')
@@ -51,14 +67,12 @@ pl.subplot(312)
 pl.yticks([0, 0.5, 1])
 pl.xlabel('Numer wejścia')
 pl.ylabel('Klasa')
-pl.plot(outTrain)
-pl.plot(ytrain)
+pl.plot(train)
 pl.legend(['Wyjście dla zbioru uczącego', 'Oczekiwana wartość'])
 pl.subplot(313)
 pl.yticks([0, 0.5, 1])
 pl.xlabel('Numer wejścia')
 pl.ylabel('Klasa')
-pl.plot(outTest)
-pl.plot(ytest)
+pl.plot(test)
 pl.legend(['Wyjście dla zbioru testowego', 'Oczekiwana wartość'])
 pl.show()
