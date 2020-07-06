@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
 # Parametry uczenia
-hiddenLayers = [10]
+hiddenLayers = [12, 7]
 epochs = 1000
 errorGoal = 0.01
 
@@ -29,14 +29,14 @@ y = scaller.fit_transform(y)
 Xtrain, Xtest, ytrain, ytest = train_test_split(
     X, y, test_size=0.2, random_state=42)
 
-# Utworzenie 2 warstwowej sieci neuronowej
+# Utworzenie sieci neuronowej
 inputLayers = []
 for (columnName, columnData) in Xtrain.iteritems():
     inputLayers.append([min(columnData), max(columnData)])
 net = nl.net.newff(inputLayers, [*hiddenLayers, 1])
 
 # Uczenie sieci
-error = net.train(Xtrain, ytrain, epochs=epochs, goal=errorGoal, show=epochs)
+error = net.train(Xtrain, ytrain, epochs=epochs, show=epochs)
 
 # Symulacja wyjść sieci
 outTrain = net.sim(Xtrain)
@@ -55,6 +55,7 @@ test.sort(key=lambda pair: pair[1])
 # Prezentacja wyników
 epochsElapsed = len(error)
 print(f'Epochs: {len(error)}')
+print(f'Error: {error}')
 pl.figure(
     f'Max epochs = {epochs} Hidden layers = {len(hiddenLayers)} Neurons = {hiddenLayers}')
 pl.subplot(311)
